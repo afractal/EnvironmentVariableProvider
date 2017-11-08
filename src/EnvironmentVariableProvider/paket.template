@@ -1,0 +1,25 @@
+type project
+title
+    EnvironmentVariableProvider
+owners
+    afractal
+authors 
+    afractal
+projectUrl
+    https://github.com/afractal/EnvironmentVariableProvider/afractal/EnvironmentVariableProvider
+iconUrl
+    https://raw.githubusercontent.com/afractal/EnvironmentVariableProvider/master/docs/files/img/logo.png
+licenseUrl
+    https://github.com/afractal/EnvironmentVariableProvider/afractal/EnvironmentVariableProvider/blob/master/LICENSE.txt
+requireLicenseAcceptance
+    false
+copyright
+    Copyright 2015
+tags
+    environment variable type provider
+summary
+    Type provider for getting environment variables.
+description
+    Type provider for getting environment variables.
+
+
