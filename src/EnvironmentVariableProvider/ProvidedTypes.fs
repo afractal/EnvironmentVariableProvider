@@ -8,7 +8,7 @@
 
 // This code has been modified and is appropriate for use in conjunction with the F# 3.0-4.0 releases
 
-namespace ProviderImplementation.ProvidedTypes
+namespace FSharp.Environment
 
 open System
 open System.Text
@@ -1980,7 +1980,7 @@ type TypeContainer =
 
 #if NO_GENERATIVE
 #else
-module GlobalProvidedAssemblyElementsTable =
+module internal GlobalProvidedAssemblyElementsTable =
     let theTable = Dictionary<Assembly, Lazy<byte[]>>()
 #endif
 
@@ -2838,7 +2838,7 @@ type ProvidedAssembly(assemblyFileName: string) =
 
 #endif // NO_GENERATIVE
 
-module Local =
+module internal Local =
 
     let makeProvidedNamespace (namespaceName:string) (types:ProvidedTypeDefinition list) =
         let types = [| for ty in types -> ty :> Type |]

@@ -5,8 +5,8 @@ open System.Reflection
 [<assembly: AssemblyTitleAttribute("EnvironmentVariableProvider")>]
 [<assembly: AssemblyProductAttribute("EnvironmentVariableProvider")>]
 [<assembly: AssemblyDescriptionAttribute("Type provider for getting environment variables.")>]
-[<assembly: AssemblyVersionAttribute("1.0.1")>]
-[<assembly: AssemblyFileVersionAttribute("1.0.1")>]
+[<assembly: AssemblyVersionAttribute("0.1.0")>]
+[<assembly: AssemblyFileVersionAttribute("0.1.0")>]
 [<assembly: AssemblyConfigurationAttribute("Release")>]
 do ()
 
@@ -14,6 +14,6 @@ module internal AssemblyVersionInformation =
     let [<Literal>] AssemblyTitle = "EnvironmentVariableProvider"
     let [<Literal>] AssemblyProduct = "EnvironmentVariableProvider"
     let [<Literal>] AssemblyDescription = "Type provider for getting environment variables."
-    let [<Literal>] AssemblyVersion = "1.0.1"
-    let [<Literal>] AssemblyFileVersion = "1.0.1"
+    let [<Literal>] AssemblyVersion = "0.1.0"
+    let [<Literal>] AssemblyFileVersion = "0.1.0"
     let [<Literal>] AssemblyConfiguration = "Release"

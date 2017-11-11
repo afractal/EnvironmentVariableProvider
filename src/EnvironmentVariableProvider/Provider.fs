@@ -1,8 +1,6 @@
-namespace  FSharp.Environment
+namespace FSharp.Environment
 // #nowarn "0025"
 
-open ProviderImplementation.ProvidedTypes
-open ProviderImplementation.ProvidedTypes.ProvidedTypesHelpers
 open Microsoft.FSharp.Core.CompilerServices
 open Microsoft.FSharp.Quotations
 open System
@@ -15,7 +13,8 @@ type EnvironmentTarget =
     | Machine = 2
 
 [<TypeProvider>]
-type EnvironmentVariableTypeProvider() as this =
+[<AbstractClass; Sealed>]
+type EnvironmentVariableProvider (cfg : TypeProviderConfig) as this =
     inherit TypeProviderForNamespaces()
 
     let asm = Assembly.GetExecutingAssembly()
@@ -23,9 +22,11 @@ type EnvironmentVariableTypeProvider() as this =
     let [<Literal>] typeName = "EnvironmentVariableProvider"
 
     let providerDefinition = ProvidedTypeDefinition(asm, ns, typeName, None)
+    let staticParams = [ ProvidedStaticParameter("target", typeof<EnvironmentTarget>) ]
 
     let instantiate typeName ([| target |]: obj array) =
-        let provider = ProvidedTypeDefinition(asm, ns, typeName, None)
+        let provider = ProvidedTypeDefinition(asm, ns, typeName, None, HideObjectMethods = true)
+        // provider.SetAttributes(provider.Attributes  ||| TypeAttributes.Abstract ||| TypeAttributes.Sealed)
 
         let targetType =
             match target with
@@ -40,7 +41,7 @@ type EnvironmentVariableTypeProvider() as this =
         let envVariables = Environment.GetEnvironmentVariables(targetType)
 
         makeProvidedConstructor List.empty (fun [] -> <@@ "" @@>)
-        |>! addXmlDocDelayed "Creates a reader for the specified file."
+        |>! addXmlDocDelayed "Creates a reader for the environment."
         |> provider.AddMember
 
         envVariables
@@ -48,7 +49,7 @@ type EnvironmentVariableTypeProvider() as this =
         |> Seq.map (fun (kvp) -> (string(kvp.Key), string(kvp.Value)))
         |> Seq.map (fun (key, value) ->
             makeProvidedProperty<string> (fun [] -> <@@ value @@>) key
-            |>! addXmlDocDelayed "Gets the picture attached to the file."
+            |>! addXmlDocDelayed value
             )
         |> Seq.toList
         |> provider.AddMembers
@@ -56,9 +57,7 @@ type EnvironmentVariableTypeProvider() as this =
         provider
 
     do
-        providerDefinition.DefineStaticParameters(
-            [ProvidedStaticParameter("target", typeof<EnvironmentTarget>)] ,
-            instantiate)
+        providerDefinition.DefineStaticParameters(staticParams, instantiate)
     do
         this.AddNamespace(ns, [ providerDefinition ])
 

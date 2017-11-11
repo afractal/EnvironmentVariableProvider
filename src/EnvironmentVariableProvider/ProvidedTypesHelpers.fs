@@ -1,4 +1,4 @@
-namespace ProviderImplementation.ProvidedTypes
+namespace FSharp.Environment
 
 [<AutoOpen>]
  module internal ProvidedTypesHelpers =
