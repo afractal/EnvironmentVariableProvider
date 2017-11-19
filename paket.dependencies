@@ -12,10 +12,13 @@ nuget FSharp.Core ~> 4.0.0.1 redirects: force
 # github fsprojects/FSharp.TypeProviders.StarterPack src/ProvidedTypes.fsi
 # github fsprojects/FSharp.TypeProviders.StarterPack src/ProvidedTypes.fs
 
+
 group Build
-  source https://nuget.org/api/v2
+    source https://nuget.org/api/v2
 
-  nuget FAKE
-  nuget FSharp.Formatting
+    nuget FAKE
+    nuget FSharp.Formatting
+    nuget Nuget.CommandLine
 
-  github fsharp/FAKE modules/Octokit/Octokit.fsx
+
+    github fsharp/FAKE modules/Octokit/Octokit.fsx

@@ -53,7 +53,9 @@ let testAssemblies = "tests/**/bin" </> configuration </> "*Tests*.dll"
 // Git configuration (used for publishing documentation in gh-pages branch)
 // The profile where the project is posted
 let gitOwner = "afractal"
-let gitHome = sprintf "%s/%s" "https://github.com/afractal/EnvironmentVariableProvider" gitOwner
+let gitHome = "https://github.com/" + gitOwner
+
+//  sprintf "%s/%s" "https://github.com/afractal/EnvironmentVariableProvider" gitOwner
 
 // The name of the project on GitHub
 let gitName = "EnvironmentVariableProvider"
@@ -145,18 +147,42 @@ Target "Build" (fun _ ->
 // Build a NuGet package
 
 Target "NuGet" (fun _ ->
-    Paket.Pack(fun p ->
+
+    CopyDir @"temp/lib" "bin" allFiles
+
+    NuGet (fun p ->
         { p with
-            OutputPath = "bin"
+            Authors = authors
+            Project = project
+            Summary = summary
+            Description = description
             Version = release.NugetVersion
-            ReleaseNotes = toLines release.Notes})
+            ReleaseNotes = String.Join(Environment.NewLine, release.Notes)
+            Tags = tags
+            WorkingDir = "temp"
+            OutputPath = "bin"
+            AccessKey = getBuildParamOrDefault "nugetkey" ""
+            Publish = hasBuildParam "nugetkey"
+            Dependencies = [] })
+        (project + ".nuspec")
+
+    CleanDir "Temp"
+    // Branches.tag "" release.NugetVersion
+    // Paket.Pack(fun p ->
+    //     { p with
+    //         OutputPath = "bin"
+    //         Version = release.NugetVersion
+    //         ReleaseNotes = toLines release.Notes
+    //         ProjectUrl = "https://github.com/afractal/EnvironmentVariableProvider" })
 )
 
 Target "PublishNuget" (fun _ ->
-    Paket.Push(fun p ->
+     Paket.Pack(fun p ->
         { p with
-            PublishUrl = "https://www.nuget.org"
-            WorkingDir = "bin" })
+            Version = release.NugetVersion
+            ReleaseNotes = String.Join(Environment.NewLine, release.Notes)
+            Symbols = true
+            OutputPath = "bin" })
 )
 
 // --------------------------------------------------------------------------------------
@@ -166,33 +192,48 @@ Target "PublishNuget" (fun _ ->
 open Octokit
 
 Target "Release" (fun _ ->
-    let user =
-        match getBuildParam "github-user" with
-        | s when not (String.IsNullOrWhiteSpace s) -> s
-        | _ -> getUserInput "Username: "
-    let pw =
-        match getBuildParam "github-pw" with
-        | s when not (String.IsNullOrWhiteSpace s) -> s
-        | _ -> getUserPassword "Password: "
-    let remote =
-        Git.CommandHelper.getGitResult "" "remote -v"
-        |> Seq.filter (fun (s: string) -> s.EndsWith("(push)"))
-        |> Seq.tryFind (fun (s: string) -> s.Contains(gitOwner + "/" + gitName))
-        |> function None -> gitHome + "/" + gitName | Some (s: string) -> s.Split().[0]
-
     StageAll ""
     Git.Commit.Commit "" (sprintf "Bump version to %s" release.NugetVersion)
-    Branches.pushBranch "" remote (Information.getBranchName "")
+    Branches.push ""
 
     Branches.tag "" release.NugetVersion
-    Branches.pushTag "" remote release.NugetVersion
+    Branches.pushTag "" "origin" release.NugetVersion
 
     // release on github
-    createClient user pw
+    createClient (getBuildParamOrDefault "github-user" "") (getBuildParamOrDefault "github-pw" "")
     |> createDraft gitOwner gitName release.NugetVersion (release.SemVer.PreRelease <> None) release.Notes
     // TODO: |> uploadFile "PATH_TO_FILE"
     |> releaseDraft
     |> Async.RunSynchronously
+
+
+    // let user =
+    //     match getBuildParam "github-user" with
+    //     | s when not (String.IsNullOrWhiteSpace s) -> s
+    //     | _ -> getUserInput "Username: "
+    // let pw =
+    //     match getBuildParam "github-pw" with
+    //     | s when not (String.IsNullOrWhiteSpace s) -> s
+    //     | _ -> getUserPassword "Password: "
+    // let remote =
+    //     Git.CommandHelper.getGitResult "" "remote -v"
+    //     |> Seq.filter (fun (s: string) -> s.EndsWith("(push)"))
+    //     |> Seq.tryFind (fun (s: string) -> s.Contains(gitOwner + "/" + gitName))
+    //     |> function None -> gitHome + "/" + gitName | Some (s: string) -> s.Split().[0]
+
+    // StageAll ""
+    // Git.Commit.Commit "" (sprintf "Bump version to %s" release.NugetVersion)
+    // Branches.pushBranch "" remote (Information.getBranchName "")
+
+    // Branches.tag "" release.NugetVersion
+    // Branches.pushTag "" remote release.NugetVersion
+
+    // // release on github
+    // createClient user pw
+    // |> createDraft gitOwner gitName release.NugetVersion (release.SemVer.PreRelease <> None) release.Notes
+    // // TODO: |> uploadFile "PATH_TO_FILE"
+    // |> releaseDraft
+    // |> Async.RunSynchronously
 )
 
 Target "BuildPackage" DoNothing
