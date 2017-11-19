@@ -12,9 +12,9 @@ type EnvironmentTarget =
     | User = 1
     | Machine = 2
 
+// cfg : TypeProviderConfig
 [<TypeProvider>]
-[<AbstractClass; Sealed>]
-type EnvironmentVariableProvider (cfg : TypeProviderConfig) as this =
+type EnvironmentVariableTypeProvider () as this =
     inherit TypeProviderForNamespaces()
 
     let asm = Assembly.GetExecutingAssembly()
@@ -25,7 +25,7 @@ type EnvironmentVariableProvider (cfg : TypeProviderConfig) as this =
     let staticParams = [ ProvidedStaticParameter("target", typeof<EnvironmentTarget>) ]
 
     let instantiate typeName ([| target |]: obj array) =
-        let provider = ProvidedTypeDefinition(asm, ns, typeName, None, HideObjectMethods = true)
+        let provider = ProvidedTypeDefinition(asm, ns, typeName, None)
         // provider.SetAttributes(provider.Attributes  ||| TypeAttributes.Abstract ||| TypeAttributes.Sealed)
 
         let targetType =
