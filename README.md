@@ -17,7 +17,7 @@ To get started, just instantiate the type provider and pass in an environment va
 open FSharp.Environment.TypeProviders
 open FSharp.Environment
 
-type EnvVars = EnvironmentVariableProvider< target = EnvironmentTarget.Machine  >
+type EnvVars = EnvironmentVariableProvider< target = EnvironmentTarget.Machine >
 
 let envVars = EnvVars()
 ```

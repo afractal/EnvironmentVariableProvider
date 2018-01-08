@@ -3,7 +3,7 @@ title
     EnvironmentVariableProvider
 owners
     afractal
-authors 
+authors
     afractal
 projectUrl
     https://github.com/afractal/EnvironmentVariableProvider/afractal/EnvironmentVariableProvider
@@ -14,7 +14,7 @@ licenseUrl
 requireLicenseAcceptance
     false
 copyright
-    Copyright 2015
+    Copyright 2018
 tags
     environment variable type provider
 summary
